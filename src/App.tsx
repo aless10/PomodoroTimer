@@ -1,10 +1,20 @@
 import React from 'react';
 import './App.css';
+import { SetTimer } from "./components/SetTimer"
+
+const Stages = Array('session', 'break')
 
 function App() {
 
   const [sessionTime, setSessionTime] = React.useState(25)
   const [breakTime, setBreakTime] = React.useState(5)
+
+  const [activeTimer, setActiveTimer] = React.useState(Stages[0].toUpperCase())
+
+  const stringifyTime = (value: number) => {
+    if (value < 10) return "0" + value
+    return value
+  }
 
   const onIncrementSession = () => {
     setSessionTime((prevState => prevState + 1))
@@ -24,15 +34,19 @@ function App() {
 
   return (
     <div className="App">
-      <div id="session">
-        <button onClick={onIncrementSession}>+</button>
-        <span>{sessionTime}</span>
-        <button onClick={onDecrementSession}>-</button>
-      </div>
-      <div id="break">
-        <button onClick={onIncrementBreak}>+</button>
-        <span >{breakTime}</span>
-        <button onClick={onDecrementBreak}>-</button>
+      <SetTimer
+        onIncrement={onIncrementSession}
+        value={sessionTime}
+        name={Stages[0]}
+        onDecrement={onDecrementSession}/>
+      <SetTimer
+        onIncrement={onIncrementBreak}
+        value={breakTime}
+        name={Stages[1]}
+        onDecrement={onDecrementBreak}/>
+      <div>
+        <h2>{activeTimer}</h2>
+        <p>{stringifyTime(sessionTime)}</p>
       </div>
     </div>
   );
