@@ -1,24 +1,53 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
+import { SetTimer } from "./components/SetTimer"
+
+const Stages = Array('session', 'break')
 
 function App() {
+
+  const [sessionTime, setSessionTime] = React.useState(25)
+  const [breakTime, setBreakTime] = React.useState(5)
+
+  const [activeTimer, setActiveTimer] = React.useState(Stages[0].toUpperCase())
+
+  const stringifyTime = (value: number) => {
+    if (value < 10) return "0" + value
+    return value
+  }
+
+  const onIncrementSession = () => {
+    setSessionTime((prevState => prevState + 1))
+  }
+
+  const onIncrementBreak = () => {
+    setBreakTime((prevState => prevState + 1))
+  }
+
+  const onDecrementSession = () => {
+    setSessionTime((prevState => prevState === 0 ? 0 : prevState - 1))
+  }
+
+  const onDecrementBreak = () => {
+    setBreakTime((prevState => prevState === 0 ? 0 : prevState - 1))
+  }
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <SetTimer
+        onIncrement={onIncrementSession}
+        value={sessionTime}
+        name={Stages[0]}
+        onDecrement={onDecrementSession}/>
+      <SetTimer
+        onIncrement={onIncrementBreak}
+        value={breakTime}
+        name={Stages[1]}
+        onDecrement={onDecrementBreak}/>
+      <div>
+        <h2>{activeTimer}</h2>
+        <p>{stringifyTime(sessionTime)}</p>
+      </div>
     </div>
   );
 }
