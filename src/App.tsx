@@ -1,52 +1,88 @@
-import React from 'react';
-import './App.css';
-import { SetTimer } from "./components/SetTimer"
+import React from "react";
+import "./App.css";
+import { SetTimer } from "./components/SetTimer";
+import { Button } from "./components/Button";
 
-const Stages = Array('session', 'break')
+const Stages = Array("session", "break");
+
+const DEFAULT_SESSION_LENGTH = 25;
+const DEFAULT_BREAK_LENGTH = 5;
 
 function App() {
+  const [sessionLength, setSessionLength] = React.useState(
+    DEFAULT_SESSION_LENGTH
+  );
+  const [breakLength, setBreakLength] = React.useState(DEFAULT_BREAK_LENGTH);
+  const [currentTime, setCurrentTime] = React.useState(sessionLength * 60);
+  const [time, setTime] = React.useState(
+    DEFAULT_SESSION_LENGTH.toString() + ":00"
+  );
+  const [timerId, setTimerId] = React.useState(null);
+  const [isActive, setIsActive] = React.useState(false);
 
-  const [sessionTime, setSessionTime] = React.useState(25)
-  const [breakTime, setBreakTime] = React.useState(5)
-
-  const [activeTimer, setActiveTimer] = React.useState(Stages[0].toUpperCase())
+  const [activeTimer, setActiveTimer] = React.useState(Stages[0]);
 
   const stringifyTime = (value: number) => {
-    if (value < 10) return "0" + value
-    return value
-  }
+    if (value < 10) return "0" + value;
+    return value.toString();
+  };
 
   const onIncrementSession = () => {
-    setSessionTime((prevState => prevState + 1))
-  }
+    setSessionLength((prevState) => prevState + 1);
+  };
 
   const onIncrementBreak = () => {
-    setBreakTime((prevState => prevState + 1))
-  }
+    setBreakLength((prevState) => prevState + 1);
+  };
 
   const onDecrementSession = () => {
-    setSessionTime((prevState => prevState === 0 ? 0 : prevState - 1))
-  }
+    setSessionLength((prevState) => (prevState === 0 ? 0 : prevState - 1));
+  };
 
   const onDecrementBreak = () => {
-    setBreakTime((prevState => prevState === 0 ? 0 : prevState - 1))
-  }
+    setBreakLength((prevState) => (prevState === 0 ? 0 : prevState - 1));
+  };
+
+  const onStart = () => {
+    console.log("Start");
+  };
+
+  const onPause = () => {
+    setIsActive(false);
+  };
+
+  const onReset = () => {
+    setIsActive(false);
+    if (activeTimer == Stages[0]) {
+      setCurrentTime(sessionLength * 60);
+    } else {
+      setCurrentTime(breakLength * 60);
+    }
+    setTimerId(null);
+  };
 
   return (
     <div className="App">
       <SetTimer
         onIncrement={onIncrementSession}
-        value={sessionTime}
+        value={sessionLength}
         name={Stages[0]}
-        onDecrement={onDecrementSession}/>
+        onDecrement={onDecrementSession}
+      />
       <SetTimer
         onIncrement={onIncrementBreak}
-        value={breakTime}
+        value={breakLength}
         name={Stages[1]}
-        onDecrement={onDecrementBreak}/>
+        onDecrement={onDecrementBreak}
+      />
       <div>
-        <h2>{activeTimer}</h2>
-        <p>{stringifyTime(sessionTime)}</p>
+        <h2>{activeTimer.toUpperCase()}</h2>
+        <p>{time}</p>
+      </div>
+      <div>
+        <Button name="start" onClick={onStart} icon="play" />
+        <Button name="pause" onClick={onPause} icon="pause" />
+        <Button name="reset" onClick={onReset} icon="undo" />
       </div>
     </div>
   );
