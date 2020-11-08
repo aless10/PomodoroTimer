@@ -14,10 +14,8 @@ function App() {
   );
   const [breakLength, setBreakLength] = React.useState(DEFAULT_BREAK_LENGTH);
   const [currentTime, setCurrentTime] = React.useState(sessionLength * 60);
-  const [time, setTime] = React.useState(
-    DEFAULT_SESSION_LENGTH.toString() + ":00"
-  );
-  const [timerId, setTimerId] = React.useState(null);
+
+  const [timerInterval, setTimerinterval] = React.useState<number | null>(null);
   const [isActive, setIsActive] = React.useState(false);
 
   const [activeTimer, setActiveTimer] = React.useState(Stages[0]);
@@ -25,6 +23,16 @@ function App() {
   const stringifyTime = (value: number) => {
     if (value < 10) return "0" + value;
     return value.toString();
+  };
+
+  const formatTime = (timeInSeconds: number) => {
+    const minutes = Math.floor(timeInSeconds / 60);
+    const minutesStr = stringifyTime(minutes);
+
+    const seconds = timeInSeconds - 60 * minutes;
+    const secondsStr = stringifyTime(seconds);
+
+    return `${minutesStr}:${secondsStr}`;
   };
 
   const onIncrementSession = () => {
@@ -44,11 +52,21 @@ function App() {
   };
 
   const onStart = () => {
+    if (isActive) return;
+    setIsActive(true);
+    const intervalID = setInterval(() => {
+      setCurrentTime((prevState) => prevState - 1);
+    }, 1000);
+    //@ts-ignore
+    setTimerinterval(intervalID);
     console.log("Start");
   };
 
   const onPause = () => {
     setIsActive(false);
+    //@ts-ignore
+    clearInterval(timerInterval);
+    setTimerinterval(null);
   };
 
   const onReset = () => {
@@ -58,7 +76,9 @@ function App() {
     } else {
       setCurrentTime(breakLength * 60);
     }
-    setTimerId(null);
+    //@ts-ignore
+    clearInterval(timerInterval);
+    setTimerinterval(null);
   };
 
   return (
@@ -77,7 +97,7 @@ function App() {
       />
       <div>
         <h2>{activeTimer.toUpperCase()}</h2>
-        <p>{time}</p>
+        <p>{formatTime(currentTime)}</p>
       </div>
       <div>
         <Button name="start" onClick={onStart} icon="play" />
