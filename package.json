@@ -1,8 +1,9 @@
 {
   "name": "pomodoro-timer",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "dependencies": {
+    "@fortawesome/fontawesome-free-solid": "latest",
     "@fortawesome/fontawesome-svg-core": "^1.2.32",
     "@fortawesome/free-solid-svg-icons": "^5.15.1",
     "@fortawesome/react-fontawesome": "^0.1.12",
@@ -17,8 +18,7 @@
     "react": "^17.0.0",
     "react-dom": "^17.0.0",
     "react-scripts": "3.4.4",
-    "typescript": "~3.7.2",
-    "@fortawesome/fontawesome-free-solid": "latest"
+    "typescript": "~3.7.2"
   },
   "scripts": {
     "start": "react-scripts start",
