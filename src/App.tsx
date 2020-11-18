@@ -109,7 +109,7 @@ function App() {
 
   const onReset = () => {
     setIsActive(false);
-    if (activeTimer == Stages[0]) {
+    if (activeTimer === Stages[0]) {
       setCurrentTime(sessionLength * 60);
     } else {
       setCurrentTime(breakLength * 60);
