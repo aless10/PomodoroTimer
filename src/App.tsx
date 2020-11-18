@@ -1,12 +1,12 @@
-import React, { useEffect } from "react";
+import React from "react";
 import "./App.css";
 import { SetTimer } from "./components/SetTimer";
 import { Button } from "./components/Button";
 
-const Stages = Array("session", "break");
+const Stages = ["session", "break"];
 
-const DEFAULT_SESSION_LENGTH = 25;
-const DEFAULT_BREAK_LENGTH = 5;
+const DEFAULT_SESSION_LENGTH = 1;
+const DEFAULT_BREAK_LENGTH = 1;
 
 function App() {
   const [sessionLength, setSessionLength] = React.useState(
@@ -19,10 +19,6 @@ function App() {
   const [isActive, setIsActive] = React.useState(false);
 
   const [activeTimer, setActiveTimer] = React.useState(Stages[0]);
-
-  useEffect(() => {
-    checkEndPhase();
-  }, [currentTime]);
 
   const stringifyTime = (value: number) => {
     if (value < 10) return "0" + value;
@@ -76,24 +72,22 @@ function App() {
     }
   };
 
-  const checkEndPhase = () => {
-    if (currentTime === 0) {
-      if (activeTimer === Stages[0]) {
-        setActiveTimer(Stages[1]);
-        setCurrentTime(breakLength * 60);
-      } else {
-        setActiveTimer(Stages[0]);
-        setCurrentTime(sessionLength * 60);
-      }
-    }
-  };
-
   const onStart = () => {
     if (isActive) return;
     setIsActive(true);
     const intervalID = setInterval(() => {
-      checkEndPhase();
-      setCurrentTime((prevState) => prevState - 1);
+      setCurrentTime((prevState: number) => {
+        const newTime = prevState - 1;
+        if (newTime > 0) return newTime;
+        console.log(activeTimer);
+        if (activeTimer === Stages[0]) {
+          setActiveTimer(Stages[1]);
+          return breakLength * 60;
+        } else {
+          setActiveTimer(Stages[0]);
+          return sessionLength * 60;
+        }
+      });
     }, 100);
     //@ts-ignore
     setTimerInterval(intervalID);
