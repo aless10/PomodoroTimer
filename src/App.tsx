@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "./App.css";
 import { SetTimer } from "./components/SetTimer";
 import { Button } from "./components/Button";
@@ -15,10 +15,14 @@ function App() {
   const [breakLength, setBreakLength] = React.useState(DEFAULT_BREAK_LENGTH);
   const [currentTime, setCurrentTime] = React.useState(sessionLength * 60);
 
-  const [timerInterval, setTimerinterval] = React.useState<number | null>(null);
+  const [timerInterval, setTimerInterval] = React.useState<number | null>(null);
   const [isActive, setIsActive] = React.useState(false);
 
   const [activeTimer, setActiveTimer] = React.useState(Stages[0]);
+
+  useEffect(() => {
+    checkEndPhase();
+  }, [currentTime]);
 
   const stringifyTime = (value: number) => {
     if (value < 10) return "0" + value;
@@ -37,28 +41,62 @@ function App() {
 
   const onIncrementSession = () => {
     setSessionLength((prevState) => prevState + 1);
+    incrementCurrentTime();
   };
 
   const onIncrementBreak = () => {
     setBreakLength((prevState) => prevState + 1);
+    incrementCurrentTime();
   };
 
   const onDecrementSession = () => {
-    setSessionLength((prevState) => (prevState === 0 ? 0 : prevState - 1));
+    setSessionLength((prevState) => (prevState === 1 ? 1 : prevState - 1));
+    decrementCurrentTime();
   };
 
   const onDecrementBreak = () => {
-    setBreakLength((prevState) => (prevState === 0 ? 0 : prevState - 1));
+    setBreakLength((prevState) => (prevState === 1 ? 1 : prevState - 1));
+    decrementCurrentTime();
+  };
+
+  const incrementCurrentTime = () => {
+    if (currentTime === 1) return;
+    if (activeTimer === Stages[0]) {
+      setCurrentTime((sessionLength + 1) * 60);
+    } else {
+      setCurrentTime((breakLength + 1) * 60);
+    }
+  };
+
+  const decrementCurrentTime = () => {
+    if (activeTimer === Stages[0]) {
+      setCurrentTime((sessionLength - 1) * 60);
+    } else {
+      setCurrentTime((breakLength - 1) * 60);
+    }
+  };
+
+  const checkEndPhase = () => {
+    if (currentTime === 0) {
+      if (activeTimer === Stages[0]) {
+        setActiveTimer(Stages[1]);
+        setCurrentTime(breakLength * 60);
+      } else {
+        setActiveTimer(Stages[0]);
+        setCurrentTime(sessionLength * 60);
+      }
+    }
   };
 
   const onStart = () => {
     if (isActive) return;
     setIsActive(true);
     const intervalID = setInterval(() => {
+      checkEndPhase();
       setCurrentTime((prevState) => prevState - 1);
-    }, 1000);
+    }, 100);
     //@ts-ignore
-    setTimerinterval(intervalID);
+    setTimerInterval(intervalID);
     console.log("Start");
   };
 
@@ -66,7 +104,7 @@ function App() {
     setIsActive(false);
     //@ts-ignore
     clearInterval(timerInterval);
-    setTimerinterval(null);
+    setTimerInterval(null);
   };
 
   const onReset = () => {
@@ -78,7 +116,7 @@ function App() {
     }
     //@ts-ignore
     clearInterval(timerInterval);
-    setTimerinterval(null);
+    setTimerInterval(null);
   };
 
   return (
