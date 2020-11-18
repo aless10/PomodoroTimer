@@ -1,24 +1,23 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "./App.css";
 import { SetTimer } from "./components/SetTimer";
 import { Button } from "./components/Button";
 
 const Stages = ["session", "break"];
 
-const DEFAULT_SESSION_LENGTH = 1;
-const DEFAULT_BREAK_LENGTH = 1;
+const DEFAULT_SESSION_LENGTH = 25;
+const DEFAULT_BREAK_LENGTH = 5;
 
 function App() {
+  const [activeTimer, setActiveTimer] = React.useState(Stages[0]);
+  const [timerInterval, setTimerInterval] = React.useState<number | null>(null);
   const [sessionLength, setSessionLength] = React.useState(
     DEFAULT_SESSION_LENGTH
   );
   const [breakLength, setBreakLength] = React.useState(DEFAULT_BREAK_LENGTH);
   const [currentTime, setCurrentTime] = React.useState(sessionLength * 60);
 
-  const [timerInterval, setTimerInterval] = React.useState<number | null>(null);
   const [isActive, setIsActive] = React.useState(false);
-
-  const [activeTimer, setActiveTimer] = React.useState(Stages[0]);
 
   const stringifyTime = (value: number) => {
     if (value < 10) return "0" + value;
@@ -72,26 +71,25 @@ function App() {
     }
   };
 
+  useEffect(() => {
+    if (currentTime === 0) {
+      if (activeTimer === Stages[0]) {
+        setActiveTimer(Stages[1]);
+        setCurrentTime(breakLength * 60);
+      } else {
+        setActiveTimer(Stages[0]);
+        setCurrentTime(sessionLength * 60);
+      }
+    }
+  }, [activeTimer, currentTime, breakLength, sessionLength]);
   const onStart = () => {
     if (isActive) return;
     setIsActive(true);
     const intervalID = setInterval(() => {
-      setCurrentTime((prevState: number) => {
-        const newTime = prevState - 1;
-        if (newTime > 0) return newTime;
-        console.log(activeTimer);
-        if (activeTimer === Stages[0]) {
-          setActiveTimer(Stages[1]);
-          return breakLength * 60;
-        } else {
-          setActiveTimer(Stages[0]);
-          return sessionLength * 60;
-        }
-      });
-    }, 100);
+      setCurrentTime((prevState) => prevState - 1);
+    }, 1000);
     //@ts-ignore
     setTimerInterval(intervalID);
-    console.log("Start");
   };
 
   const onPause = () => {
